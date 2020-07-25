@@ -132,18 +132,22 @@ class IliasDownloader:
             )
 
     def _try_download(self, info: IliasDownloadInfo, target: Path) -> bool:
+        print("Got info: ", info.modification_date, info.path, info.url)
         url = info.url()
+        print("Fetched URL: ", url)
         if url is None:
             PRETTY.warning(f"Could not download {str(info.path)!r} as I got no URL :/")
             return True
 
-        with self._session.get(url, stream=True) as response:
+        with self._session.get(url, stream=True, timeout=5) as response:
             content_type = response.headers["content-type"]
             has_content_disposition = "content-disposition" in response.headers
 
             if content_type.startswith("text/html") and not has_content_disposition:
                 if self._is_logged_in(soupify(response)):
                     raise ContentTypeException("Attempting to download a web page, not a file")
+                print("Got webpage", soupify(response))
+                print("From URL", response.url)
 
                 return False
 

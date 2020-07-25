@@ -482,12 +482,14 @@ class IliasCrawler:
 
     def _crawl_video_url_from_play_link(self, play_url: str) -> Callable[[], Optional[str]]:
         def inner() -> Optional[str]:
+            print("Fetching video url")
             # Fetch the actual video page. This is a small wrapper page initializing a javscript
             # player. Sadly we can not execute that JS. The actual video stream url is nowhere
             # on the page, but defined in a JS object inside a script tag, passed to the player
             # library.
             # We do the impossible and RegEx the stream JSON object out of the page's HTML source
             video_page_soup = soupify(self._session.get(play_url))
+            print("Got video page soup")
             regex: re.Pattern = re.compile(
                 r"({\"streams\"[\s\S]+?),\s*{\"paella_config_file", re.IGNORECASE
             )
@@ -500,6 +502,7 @@ class IliasCrawler:
 
             # parse it
             json_object = json.loads(json_str)
+            print("Got JSON payload", json_object)
             # and fetch the video url!
             video_url = json_object["streams"][0]["sources"]["mp4"][0]["src"]
             return video_url
