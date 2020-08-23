@@ -86,6 +86,7 @@ class KitShibbolethAuthenticator(IliasAuthenticator):
 
             if not self._login_successful(soup):
                 print("Incorrect credentials.")
+                print(soup)
                 self._auth.invalidate_credentials()
 
         # Equivalent: Being redirected via JS automatically
